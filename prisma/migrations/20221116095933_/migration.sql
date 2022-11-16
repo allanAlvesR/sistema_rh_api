@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Applicant" ALTER COLUMN "profile" SET DATA TYPE VARCHAR(20);
+
+-- AlterTable
+ALTER TABLE "Job" ALTER COLUMN "job_profile" SET DATA TYPE VARCHAR(20);
