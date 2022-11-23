@@ -25,10 +25,8 @@ model Applicant {
 	name    String?
 	email   String   @unique
 	tel String?
-	quiz_score Int @default(-1)
-	interview Boolean  @default(false)
 	profile  String   @db.VarChar(20)
-	jobs Job[]
+	jobs JobApplicants[]
 }
 
 
@@ -37,5 +35,15 @@ model Job {
 	name    String?
 	description String?
 	job_profile  String   @db.VarChar(20)
-	applicants Applicant[]
+	applicants JobApplicants[]
+}
+
+model JobApplicants {
+	id        Int      @id @default(autoincrement())
+	job   Job? @relation(fields: [jobId], references: [id])
+	applicant    Applicant?  @relation(fields: [applicantId], references: [id])
+	jobId Int?
+	applicantId  Int?
+	quiz_score Int @default(-1)
+	interview Boolean  @default(false)
 }

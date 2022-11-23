@@ -3,7 +3,8 @@ import {
   addApplicantToJob,
   createJob,
   listAllJobs,
-  findJob
+  findJob,
+  applicantInterview
 } from '../services/job.service'
 
 const router = Router();
@@ -39,6 +40,15 @@ router.get('/jobs/:id', async (req: Request, res: Response, next: NextFunction) 
   try {
     const result = await findJob(Number(req.params.id));
     res.json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.patch('/jobs/:jobId/interview/:applicantId', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = await applicantInterview(req.body.interview, Number(req.params.jobId), Number(req.params.applicantId));
+    res.json({ user });
   } catch (error) {
     next(error);
   }

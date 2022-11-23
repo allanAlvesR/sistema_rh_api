@@ -3,12 +3,14 @@ import {
   listAllApplicants,
   createApplicant,
   updateApplicant,
-  applicantInterview
+  findApplicantById,
 } from '../services/applicant.service'
 
 const router = Router();
 
+
 router.post('/applicants', async (req: Request, res: Response, next: NextFunction) => {
+  console.log(req.body)
     try {
       const user = await createApplicant(req.body);
       res.json({ user });
@@ -26,15 +28,25 @@ router.get('/applicants', async (req: Request, res: Response, next: NextFunction
   }
 });
 
-router.patch('/applicants/interview/:id', async (req: Request, res: Response, next: NextFunction) => {
+router.get('/applicants/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const user = await applicantInterview(req.body.interview, Number(req.params.id));
-    console.log(req.body.interview)
-    res.json({ user });
+    const result = await findApplicantById(Number(req.params.id));
+    res.json(result);
   } catch (error) {
     next(error);
   }
 });
+
+
+// router.patch('/applicants/interview/:id', async (req: Request, res: Response, next: NextFunction) => {
+//   try {
+//     const user = await applicantInterview(req.body.interview, Number(req.params.id));
+//     console.log(req.body.interview)
+//     res.json({ user });
+//   } catch (error) {
+//     next(error);
+//   }
+// });
 
 
 export default router;

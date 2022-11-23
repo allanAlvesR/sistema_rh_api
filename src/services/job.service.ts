@@ -1,5 +1,5 @@
 import createHttpError from 'http-errors';
-import {PrismaClient, Job, Applicant} from '@prisma/client';
+import {PrismaClient, Job, Applicant, JobApplicants} from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -83,7 +83,7 @@ export const deleteApplcant = async (id:number) => {
 
 export const findJob = async (id: number) => {
     const job = await prisma.job.findUnique({
-      include: {applicants: true},
+      include: {applicants: {include: {applicant: true}}},
       where: {
         id,
       },
@@ -97,14 +97,42 @@ export const findJob = async (id: number) => {
   };
 
 export const addApplicantToJob =async (id: number, applicants: []) => {
-    const data = applicants.map(id => {return({"id": id})})
+    const data = applicants.map(id => {return({"applicantId": id, "quiz_score": Math.floor(Math.random() * 11)})})
     const job = findJob(id);
     
     const result = await prisma.job.update({
          where: { id: id },
          data: {
-           applicants: { connect: data},
+           applicants: { create: data},
          },
        });
     return result;
+};
+
+export const applicantInterview = async (interview: boolean, jobId: number, applicantId: number) => {
+  const jobApplicants = await findJobApplicants(jobId, applicantId);
+  console.log(jobApplicants, interview)
+  const data = {"applicantId": applicantId, interview};
+  const result = await prisma.jobApplicants.update({
+    where: { id: jobApplicants.id},
+    data: {
+      interview,
+    },
+  });
+return result;
+};
+
+export const findJobApplicants = async (jobId: number, applicantId: number) => {
+  const jobApplicants = await prisma.jobApplicants.findFirst({
+    where: {
+      jobId,
+      applicantId,
+    },
+  }) as JobApplicants;
+
+  if (!jobApplicants) {
+    throw createHttpError(404, "JobApplicants not found." );
+  }
+
+  return jobApplicants;
 };

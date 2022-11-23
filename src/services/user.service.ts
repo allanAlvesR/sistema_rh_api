@@ -1,8 +1,12 @@
 import bcrypt from 'bcryptjs';
 import createHttpError from 'http-errors';
 import {PrismaClient, User} from '@prisma/client';
+import jwt from 'jsonwebtoken';
+import {generateToken} from '../utils/token.utils'
 
 const prisma = new PrismaClient();
+
+
 
 const checkEmail = async (email: string) => {
   const checkEmail = await prisma.user.findUnique({
@@ -80,11 +84,11 @@ export const login = async (userPayload: any) => {
 
   if (user) {
     const match = await bcrypt.compare(password, user.password);
-
     if (match) {
       return {
         email: user.email,
         name: user.name,
+        token: generateToken(user.email),
       };
     }
   }

@@ -1,5 +1,5 @@
 import createHttpError from 'http-errors';
-import {PrismaClient, Applicant} from '@prisma/client';
+import {PrismaClient, Applicant, JobApplicants} from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -23,7 +23,7 @@ export const createApplicant = async (input: Applicant) => {
   const name = input.name?.trim();
   const tel = input.tel?.trim();
   const profile = input.profile?.trim();
-  const quiz_score = Math.floor(Math.random() * 11);
+  //const quiz_score = Math.floor(Math.random() * 11);
 
   if (!email) {
     throw createHttpError(422, "email can't be blank" );
@@ -46,7 +46,6 @@ export const createApplicant = async (input: Applicant) => {
       email,
       tel,
       profile,
-      quiz_score
     },
     select: {
       email: true,
@@ -79,8 +78,6 @@ export const updateApplicant = async (applicantPayload: any, id: number) => {
       email: true,
       tel: true,
       profile: true,
-      interview: true,
-      quiz_score: true,
 
     },
   }) as Applicant;
@@ -117,6 +114,7 @@ export const listAllApplicants = async () => {
   return applicant;
 };
 
+
 export const deleteApplicant =async (id:number) => {
   const applicant = await prisma.applicant.delete({
     where: {
@@ -125,29 +123,25 @@ export const deleteApplicant =async (id:number) => {
   });
 
   return applicant;
-}
+};
 
-export const applicantInterview = async (interview: boolean, id: number) => {
-  console.log(interview)
-  const applicant = await prisma.applicant.update({
+export const findApplicantById = async (id:number) => {
+  const applicant = await prisma.applicant.findUnique({
     where: {
-      id: id,
-    },
-    data: {
-      interview
+      id,
     },
     select: {
+      id: true,
       name: true,
       email: true,
       tel: true,
       profile: true,
-      interview: true,
-      quiz_score: true,
-
     },
   }) as Applicant;
-  console.log(applicant)
-  return {
-    ...applicant,
-  };
+
+  if (!applicant) {
+    throw createHttpError(404, "applicant not found." );
+  }
+
+  return applicant;
 };
